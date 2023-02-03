@@ -89,13 +89,13 @@ else:
 
 
 #相対パスを指定
-folder_path = first_part
+folder_alignment_path = first_part
 
 
 #フォルダ内のファイルを一つずつ読み込む
-for file_name in os.listdir(folder_path):
+for file_name in os.listdir(folder_alignment_path):
     if file_name.endswith('.fasta'):
-        file_path = os.path.join(folder_path, file_name)
+        file_path = os.path.join(folder_alignment_path, file_name)
         alignment = AlignIO.read(file_path, 'fasta')
         #一連の処理の進捗を確認するために表示
         name = file_name.replace('.fasta','')
@@ -134,8 +134,6 @@ for file_name in os.listdir(folder_path):
         consensus_record.description = 'consensus sequence'
         SeqIO.write(consensus_record, name + '_consensus.fasta', 'fasta')
 
-# alignment_pythonフォルダのパス
-folder_path = '/home/dkcom/デスクトップ/primer_design/alignment_python/'
 
 # "_"で区切って、最初の部分を取り出す
 first_part = name.split("_")[0]
@@ -164,8 +162,30 @@ else:
 
 
 #taget種のファイルパス
-file_path = 'Sympetrum_consensus/Sympetrum_kunckeli_consensus.fasta'
-target = AlignIO.read(file_path, 'fasta')
+def select_file(path):
+    files = os.listdir(path)
+    for i, file in enumerate(files, start=1):
+        print(f"{i}. {file}")
+    choice = None
+    while choice is None:
+        try:
+            choice = int(input("Enter the number of the file you want to select: "))
+            if choice not in range(1, len(files) + 1):
+                raise ValueError
+        except ValueError:
+            print("Invalid option, please enter a number between 1 and", len(files))
+            choice = None
+    selected_file = files[choice - 1]
+    return os.path.join(path, selected_file)
+
+target_path = first_part+"_consensus"
+
+#黄色文字で表示
+print("\033[33m{}\033[0m".format(f"ターゲット種の配列データを選択してください"))
+selected_file_path = select_file(target_path)
+print("\033[33m{}\033[0m".format(f"Selected file: {selected_file_path}"))
+
+target = AlignIO.read(selected_file_path, 'fasta')
 print(target.format('fasta'))
 
 
